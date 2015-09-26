@@ -74,7 +74,16 @@ function SendQuery() {
 	if [[ "$QUERY" == "" ]]; then
 		Message "MySQL query must be provided."
 	else
-		echo "$QUERY" | mysql --user=$DBUSER --password=$DBPASS --host=$DBSERVER $DBNAME
+		if [[ "$DBUSER" != "" ]]; then
+			PUSER=--user=$DBUSER
+		fi
+		if [[ "$DBPASS" != "" ]]; then
+			PPASS=--password=$DBPASS
+		fi
+		if [[ "$DBSERVER" != "" ]]; then
+			PHOST=--host=$DBSERVER
+		fi
+		echo "$QUERY" | mysql $PUSER $PPASS $PHOST $DBNAME
 		ERRCOD=$?
 		if [[ "$ERRCOD" != "0" ]]; then
 			echo "Returned error $ERRCOD."
@@ -84,7 +93,16 @@ function SendQuery() {
 }
 function InstallDB() {
 	Message "Creating database $DBNAME"
-	echo "CREATE DATABASE $DBNAME;" | mysql --user=$DBUSER --password=$DBPASS --host=$DBSERVER
+	if [[ "$DBUSER" != "" ]]; then
+		PUSER=--user=$DBUSER
+	fi
+	if [[ "$DBPASS" != "" ]]; then
+		PPASS=--password=$DBPASS
+	fi
+	if [[ "$DBSERVER" != "" ]]; then
+		PHOST=--host=$DBSERVER
+	fi
+	echo "CREATE DATABASE $DBNAME;" | mysql $PUSER $PPASS $PHOST
 	ERRCOD=$?
 	if [[ "$ERRCOD" != "0" ]]; then
 		echo "Error creating database $DBANE. Check your .my.cnf file and provided credentials in the client section to the server $DBSERVER."
