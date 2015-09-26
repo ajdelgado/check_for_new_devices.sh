@@ -3,6 +3,8 @@ DBNAME="known_devices"
 DBTABLEKNOWDEVICES="known_devices"
 DBTABLEIPS="devices_ips"
 DBSERVER="localhost"
+DBUSER=""
+DBPASS=""
 RECIPIENT=""
 OUIDB="/var/lib/oui.txt"
 DEBUG=0
@@ -72,7 +74,7 @@ function SendQuery() {
 	if [[ "$QUERY" == "" ]]; then
 		Message "MySQL query must be provided."
 	else
-		echo "$QUERY" | mysql --host=$DBSERVER $DBNAME
+		echo "$QUERY" | mysql --user=$DBUSER --password=$DBPASS --host=$DBSERVER $DBNAME
 		ERRCOD=$?
 		if [[ "$ERRCOD" != "0" ]]; then
 			echo "Returned error $ERRCOD."
@@ -82,7 +84,7 @@ function SendQuery() {
 }
 function InstallDB() {
 	Message "Creating database $DBNAME"
-	echo "CREATE DATABASE $DBNAME;" | mysql --host=$DBSERVER
+	echo "CREATE DATABASE $DBNAME;" | mysql --user=$DBUSER --password=$DBPASS --host=$DBSERVER
 	ERRCOD=$?
 	if [[ "$ERRCOD" != "0" ]]; then
 		echo "Error creating database $DBANE. Check your .my.cnf file and provided credentials in the client section to the server $DBSERVER."
@@ -181,10 +183,12 @@ function TestDB() {
 	fi
 }
 function Usage() {
-	echo "$0 [--debug|--verbose|-d|-v] [--recipient|-r mail@exmaple.com] [--help|-h]"
-	echo "--debug|--verbose|-d|-v           Increase debug information."
-	echo "--recipient|-r mail@example.com   Send alerts to mail@example.com instead of default $RECIPIENT."
-	echo "--help|-h                         Show this help"
+	echo "$0 [--debug|--verbose|-d|-v] [--recipient|-r mail@exmaple.com] [--help|-h] [--db-user|-u username] [--db-pass|-p password]"
+	echo "--debug|--verbose|-d|-v           Optional. Increase debug information."
+	echo "--recipient|-r mail@example.com   Optional. Send alerts to mail@example.com instead of default $RECIPIENT. If not indicated, no alerts will be sent."
+	echo "--db-user|-u username             Optional. User account to connect to the MySQL server. If not indicated the MySQL client will use the .my.cnf file stored in your home folder."
+	echo "--db-pass|-p password             Optional. Password to connect to the MySQL server. If not indicated the MySQL client will use the .my.cnf file stored in your home folder."
+	echo "--help|-h                         Optional. Show this help."
 }
 for VAR in $*
 do
@@ -197,6 +201,16 @@ do
 		"--recipient"|"-r")
 			RECIPIENT="$2"
 			Message "The recipient for all mail will be '$RECIPIENT'"
+			shift 2
+			;;
+		"--db-user"|"-u")
+			DBUSER="$2"
+			Message "The user account to connect to the MySQL server will be $DBUSER"
+			shift 2
+			;;
+		"--db-pass"|"-p")
+			DBPASS="$2"
+			Message "The password to connect to the MySQL server was set up."
 			shift 2
 			;;
 		"--help"|"-h"|"-?"|"/?")
