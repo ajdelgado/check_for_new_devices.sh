@@ -10,3 +10,4 @@ Requirements:
 
 Installation:
 If the user running the script has granted permissions to create a database, the script will do it. Otherwise create a database and add permissions to the user running the script (using the .my.cnf file in the home folder) and the script will do the rest.
+Main (latest) code in https://repos.susurrando.com/adelgado/check_for_new_devices.sh
